@@ -136,6 +136,12 @@ app.post("/respostas", (req, res) => {
         });
     }
 
+    if (tentativa.quiz_id !== pergunta.quiz_id) {
+        return res.status(400).json({
+            mensagem: "A pergunta não pertence ao quiz da tentativa"
+        });
+    }
+
     if (alternativa.pergunta_id !== pergunta_id) {
         return res.status(400).json({
             mensagem: "A alternativa não pertence à pergunta"
@@ -260,6 +266,12 @@ app.put("/usuarios/:id", (req, res) => {
 
     const usuario = usuarios.find(usuario => usuario.id === id);
 
+    if (!usuario) {
+        return res.status(400).json({
+            mensagem: "Usuário não encontrado"
+        });
+    }
+
     usuario.nome = req.body.nome;
 
     res.json(usuario);
@@ -271,6 +283,12 @@ app.delete("/usuarios/:id", (req, res) => {
     const id = Number(req.params.id);
 
     const indice = usuarios.findIndex(usuario => usuario.id === id);
+
+    if (indice === -1) {
+        return res.status(400).json({
+            mensagem: "Usuário não encontrado"
+        });
+    }
 
     usuarios.splice(indice, 1);
 
@@ -313,6 +331,12 @@ app.put("/quizzes/:id", (req, res) => {
 
     const quiz = quizzes.find(quiz => quiz.id === id);
 
+    if (!quiz) {
+        return res.status(400).json({
+            mensagem: "Quiz não encontrado"
+        });
+    }
+
     quiz.titulo = req.body.titulo;
 
     res.json(quiz);
@@ -324,6 +348,12 @@ app.delete("/quizzes/:id", (req, res) => {
     const id = Number(req.params.id);
 
     const indice = quizzes.findIndex(quiz => quiz.id === id);
+
+    if (indice === -1) {
+        return res.status(400).json({
+            mensagem: "Quiz não encontrado"
+        });
+    }
 
     quizzes.splice(indice, 1);
 
@@ -358,6 +388,16 @@ app.post("/quizzes/:quiz_id/perguntas", (req, res) => {
 
     const quiz_id = Number(req.params.quiz_id);
 
+    const quiz = quizzes.find(
+        quiz => quiz.id === quiz_id
+    );
+
+    if (!quiz) {
+        return res.status(400).json({
+            mensagem: "Quiz não encontrado"
+        });
+    }
+
     const novaPergunta = {
         id: perguntas.length + 1,
         quiz_id: quiz_id,
@@ -379,6 +419,12 @@ app.put("/quizzes/:quiz_id/perguntas/:id", (req, res) => {
         pergunta => pergunta.id === id && pergunta.quiz_id === quiz_id
     );
 
+    if (!pergunta) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
+        });
+    }
+
     pergunta.texto = req.body.texto;
 
     res.json(pergunta);
@@ -394,6 +440,12 @@ app.delete("/quizzes/:quiz_id/perguntas/:id", (req, res) => {
         pergunta => pergunta.id === id && pergunta.quiz_id === quiz_id
     );
 
+    if (indice === -1) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
+        });
+    }
+
     perguntas.splice(indice, 1);
 
     res.json({ mensagem: "Pergunta deletada" });
@@ -402,7 +454,18 @@ app.delete("/quizzes/:quiz_id/perguntas/:id", (req, res) => {
 
 app.get("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas", (req, res) => {
 
+    const quiz_id = Number(req.params.quiz_id);
     const pergunta_id = Number(req.params.pergunta_id);
+
+    const pergunta = perguntas.find(
+        pergunta => pergunta.id === pergunta_id && pergunta.quiz_id === quiz_id
+    );
+
+    if (!pergunta) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
+        });
+    }
 
     const alternativasDaPergunta = alternativas
         .filter(alternativa => alternativa.pergunta_id === pergunta_id)
@@ -418,8 +481,19 @@ app.get("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas", (req, res) => {
 
 app.get("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas/:id", (req, res) => {
 
+    const quiz_id = Number(req.params.quiz_id);
     const pergunta_id = Number(req.params.pergunta_id);
     const id = Number(req.params.id);
+
+    const pergunta = perguntas.find(
+        pergunta => pergunta.id === pergunta_id && pergunta.quiz_id === quiz_id
+    );
+
+    if (!pergunta) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
+        });
+    }
 
     const alternativa = alternativas.find(
         alternativa => alternativa.id === id && alternativa.pergunta_id === pergunta_id
@@ -432,14 +506,27 @@ app.get("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas/:id", (req, res) 
             texto: alternativa.texto
         });
     } else {
-        res.json(alternativa);
+        res.status(400).json({
+            mensagem: "Alternativa não encontrada"
+        });
     }
 
 });
 
 app.post("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas", (req, res) => {
 
+    const quiz_id = Number(req.params.quiz_id);
     const pergunta_id = Number(req.params.pergunta_id);
+
+    const pergunta = perguntas.find(
+        pergunta => pergunta.id === pergunta_id && pergunta.quiz_id === quiz_id
+    );
+
+    if (!pergunta) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
+        });
+    }
 
     const alternativasDaPergunta = alternativas.filter(
         alternativa => alternativa.pergunta_id === pergunta_id
@@ -470,12 +557,29 @@ app.post("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas", (req, res) => 
 
 app.put("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas/:id", (req, res) => {
 
+    const quiz_id = Number(req.params.quiz_id);
     const pergunta_id = Number(req.params.pergunta_id);
     const id = Number(req.params.id);
+
+    const pergunta = perguntas.find(
+        pergunta => pergunta.id === pergunta_id && pergunta.quiz_id === quiz_id
+    );
+
+    if (!pergunta) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
+        });
+    }
 
     const alternativa = alternativas.find(
         alternativa => alternativa.id === id && alternativa.pergunta_id === pergunta_id
     );
+
+    if (!alternativa) {
+        return res.status(400).json({
+            mensagem: "Alternativa não encontrada"
+        });
+    }
 
     alternativa.texto = req.body.texto;
     alternativa.correta = req.body.correta;
@@ -490,8 +594,19 @@ app.put("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas/:id", (req, res) 
 
 app.delete("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas/:id", (req, res) => {
 
+    const quiz_id = Number(req.params.quiz_id);
     const pergunta_id = Number(req.params.pergunta_id);
     const id = Number(req.params.id);
+
+    const pergunta = perguntas.find(
+        pergunta => pergunta.id === pergunta_id && pergunta.quiz_id === quiz_id
+    );
+
+    if (!pergunta) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
+        });
+    }
 
     const alternativasDaPergunta = alternativas.filter(
         alternativa => alternativa.pergunta_id === pergunta_id
@@ -506,6 +621,12 @@ app.delete("/quizzes/:quiz_id/perguntas/:pergunta_id/alternativas/:id", (req, re
     const indice = alternativas.findIndex(
         alternativa => alternativa.id === id && alternativa.pergunta_id === pergunta_id
     );
+
+    if (indice === -1) {
+        return res.status(400).json({
+            mensagem: "Alternativa não encontrada"
+        });
+    }
 
     alternativas.splice(indice, 1);
 
