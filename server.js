@@ -120,9 +120,19 @@ app.post("/respostas", (req, res) => {
         tentativa => tentativa.id === tentativa_id
     );
 
+    const pergunta = perguntas.find(
+        pergunta => pergunta.id === pergunta_id
+    );
+
     if (!alternativa || !tentativa) {
         return res.status(400).json({
             mensagem: "Alternativa ou tentativa não encontrada"
+        });
+    }
+
+    if (!pergunta) {
+        return res.status(400).json({
+            mensagem: "Pergunta não encontrada"
         });
     }
 
