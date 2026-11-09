@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {    
+  "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:up": "docker start quiz-api || docker run -d --name quiz-api -p 127.0.0.1:27017:27017 -v quiz-api-data:/data/db mongo:8",
     "db:down": "docker stop quiz-api",
@@ -12,13 +12,14 @@
     "predev": "npm run db:up",
     "dev": "node --watch src/server.js",
     "start": "node src/server.js"
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^18.0.10",
+    "express": "^5.2.1",
+    "mongodb": "^7.8.0"
   }
 }
